@@ -1,31 +1,41 @@
-FROM php:7.2-fpm
- 
-RUN apt-get update > /dev/null && apt-get install -y \
-   git \
-   unzip \
-   libjpeg-dev \
-   libxpm-dev \
-   libwebp-dev \
-   libfreetype6-dev \
-   libjpeg62-turbo-dev \
-   libmcrypt-dev \
-   libpng-dev \
-   zlib1g-dev \
-   libicu-dev \
-   jpegoptim \
-   g++ \
-   libxrender1 \
-   libfontconfig \
-   nano \
-   cron
-   
-RUN docker-php-ext-install intl > /dev/null \
-   && docker-php-ext-install zip > /dev/null \
-   && docker-php-ext-install bcmath > /dev/null
- 
-RUN apt-get update && apt-get install -y libmcrypt-dev \
-    && pecl install mcrypt-1.0.4 \
-    && docker-php-ext-enable mcrypt
+FROM php:8.2-fpm
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Install dependencies
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    unzip \
+    git \
+    curl \
+    libzip-dev \
+    libonig-dev \
+    mysql-common \
+    libldap2-dev \
+    libicu-dev
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install extensions
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl \
+&& docker-php-ext-install mysqli && docker-php-ext-enable mysqli \
+&& docker-php-ext-install gd \
+&& docker-php-ext-enable gd \
+&& docker-php-ext-configure ldap \
+&&  docker-php-ext-install ldap \
+&& docker-php-ext-configure intl \
+&& docker-php-ext-install intl \
+&& docker-php-ext-enable intl
  
 #--------------------------------------------------------------------------
 # Optional Software's Installation
@@ -97,4 +107,13 @@ RUN if [ ${ADD_ALIASES} = true ]; then \
    echo 'alias sf3="php bin/console"' >> ~/.bashrc && \
    echo 'alias lv="php artisan"' >> ~/.bashrc \
 ;fi
+
+# RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1001 mohammad
+
+
+RUN useradd -ms /bin/bash mohammad
+RUN usermod -aG sudo mohammad
+
+USER mohammad
+
 WORKDIR /var/www/html
