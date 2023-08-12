@@ -44,6 +44,6 @@ docker inspect <container id>
 
 5. In the project directory, make a public folder and inside it create a index.php file for testing 
 
- Now the app should be accessible via [this link](http://myapp.test)
+ Now the app should be accessible via [this link](http://myapp.test) and the phpmyadmin via [this link](http://localhost:8081/index.php) 
 
  This project is based on the [blog](https://polcode.com/resources/blog/how-to-run-a-laravel-application-locally-with-docker/) 
